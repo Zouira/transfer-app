@@ -236,6 +236,20 @@ app.get('/api/transfers/search', authenticateToken, async (req, res) => {
   }
 });
 
+// Recherche par téléphone (public - pour track.html)
+app.get('/api/transfers/lookup', async (req, res) => {
+  try {
+    const { phone } = req.query;
+    if (!phone) {
+      return res.status(400).json({ success: false, error: 'Téléphone requis' });
+    }
+    const transfers = await db.getTransfersByPhone(phone);
+    res.json({ success: true, transfers });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Détails d'un transfert
 app.get('/api/transfers/:id', authenticateToken, async (req, res) => {
   try {

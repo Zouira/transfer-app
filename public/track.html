@@ -378,16 +378,85 @@
         let refreshInterval;
 
         if (!token) {
+            // Show tracking lookup page
             document.getElementById('app').innerHTML = `
-                <div class="not-found">
-                    <i class="fas fa-link-slash"></i>
-                    <h2>Lien invalide</h2>
-                    <p>Ce lien de suivi n'est pas valide ou a expiré.</p>
+                <div class="header">
+                    <div style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%);">
+                        <a href="/dashboard.html" style="color: white; font-size: 20px;"><i class="fas fa-arrow-left"></i></a>
+                    </div>
+                    <h1><i class="fas fa-map-marker-alt"></i> Suivi Transfert</h1>
+                    <p>Suivez votre transfert en temps réel</p>
+                </div>
+                
+                <div style="padding: 40px 20px; text-align: center;">
+                    <div style="background: white; border-radius: 20px; padding: 40px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto;">
+                        <div style="width: 80px; height: 80px; background: rgba(211, 84, 0, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--primary); font-size: 36px;">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h2 style="color: var(--dark); margin-bottom: 10px;">Rechercher un transfert</h2>
+                        <p style="color: var(--gray); margin-bottom: 30px; font-size: 14px;">Entrez votre numéro de téléphone pour voir vos transferts</p>
+                        
+                        <form id="lookupForm" style="text-align: left;">
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--dark);">Numéro de téléphone</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-phone" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--primary);"></i>
+                                    <input type="tel" id="lookupPhone" placeholder="ex: +212 6XX XXX XXX" required
+                                        style="width: 100%; padding: 16px 16px 16px 50px; border: 2px solid #e8e8e8; border-radius: 14px; font-size: 16px; font-family: inherit;">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" 
+                                style="width: 100%; padding: 18px; background: var(--gradient); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <i class="fas fa-search"></i> Rechercher
+                            </button>
+                        </form>
+                        
+                        <div id="lookupResults" style="margin-top: 30px; text-align: left;"></div>
+                    </div>
                 </div>
             `;
+            
+            document.getElementById('lookupForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const phone = document.getElementById('lookupPhone').value;
+                
+                try {
+                    const res = await fetch(`/api/transfers/lookup?phone=${encodeURIComponent(phone)}`);
+                    const data = await res.json();
+                    
+                    if (data.transfers && data.transfers.length > 0) {
+                        const resultsDiv = document.getElementById('lookupResults');
+                        resultsDiv.innerHTML = `
+                            <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--dark);">Vos transferts :</h3>
+                            ${data.transfers.map(t => `
+                                <a href="/track.html?token=${t.tracking_token}" 
+                                    style="display: block; background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px; text-decoration: none; color: inherit; border: 2px solid transparent; transition: all 0.3s;"
+                                    onmouseover="this.style.borderColor='var(--primary)'" 
+                                    onmouseout="this.style.borderColor='transparent'">
+                                    <div style="font-weight: 600; color: var(--dark); margin-bottom: 5px;">${t.client_name}</div>
+                                    <div style="font-size: 13px; color: var(--gray); margin-bottom: 5px;">${t.pickup_location} → ${t.destination}</div>
+                                    <div style="font-size: 12px; color: var(--primary);">
+                                        <i class="fas fa-clock"></i> ${new Date(t.pickup_time).toLocaleString('fr-FR')}
+                                    </div>
+                                </a>
+                            `).join('')}
+                        `;
+                    } else {
+                        document.getElementById('lookupResults').innerHTML = `
+                            <div style="text-align: center; padding: 20px; color: var(--gray);">
+                                <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 10px; display: block;"></i>
+                                Aucun transfert trouvé avec ce numéro
+                            </div>
+                        `;
+                    }
+                } catch (err) {
+                    alert('Erreur lors de la recherche');
+                }
+            });
         } else {
             loadTrackingData();
-            refreshInterval = setInterval(loadTrackingData, 30000); // Refresh every 30s
+            refreshInterval = setInterval(loadTrackingData, 30000);
         }
 
         async function loadTrackingData() {

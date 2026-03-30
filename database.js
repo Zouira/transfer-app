@@ -344,6 +344,24 @@ class Database {
     });
   }
 
+  getTransfersByPhone(phone) {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        `SELECT t.*, d.name as driver_name, d.phone as driver_phone 
+         FROM transfers t 
+         LEFT JOIN drivers d ON t.driver_id = d.id 
+         WHERE t.client_phone = ? 
+         ORDER BY t.pickup_time DESC 
+         LIMIT 10`,
+        [phone],
+        (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows);
+        }
+      );
+    });
+  }
+
   updateTransfer(id, updates) {
     return new Promise((resolve, reject) => {
       const fields = Object.keys(updates).map(k => `${k} = ?`).join(', ');
