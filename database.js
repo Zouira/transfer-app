@@ -360,11 +360,11 @@ class Database {
   getTransfersByPhone(phone) {
     return new Promise((resolve, reject) => {
       this.db.all(
-        `SELECT t.*, d.name as driver_name, d.phone as driver_phone 
+        `SELECT t.*, d.name as driver_name, d.phone as driver_phone, t.trackingToken as tracking_token
          FROM transfers t 
-         LEFT JOIN drivers d ON t.driver_id = d.id 
-         WHERE t.client_phone = ? 
-         ORDER BY t.pickup_time DESC 
+         LEFT JOIN drivers d ON t.driverId = d.id 
+         WHERE t.clientPhone = ? 
+         ORDER BY t.pickupDateTime DESC 
          LIMIT 10`,
         [phone],
         (err, rows) => {

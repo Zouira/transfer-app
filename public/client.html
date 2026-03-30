@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Espace Client - Transfer Marrakech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #d35400;
+            --primary-light: #e67e22;
+            --secondary: #27ae60;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --light: #f5f7fa;
+            --gradient: linear-gradient(135deg, #d35400 0%, #e67e22 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--light);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--gradient);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: -30px auto 0;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .search-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(211, 84, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary);
+            font-size: 36px;
+        }
+
+        .search-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .search-subtitle {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 16px 16px 50px;
+            border: 2px solid #e8e8e8;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(211, 84, 0, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .btn-search {
+            width: 100%;
+            padding: 18px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(211, 84, 0, 0.3);
+        }
+
+        .btn-search:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Results */
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .results-title i {
+            color: var(--primary);
+        }
+
+        .transfer-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .transfer-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .transfer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .transfer-route {
+            font-size: 15px;
+            color: var(--dark);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .transfer-route i {
+            color: var(--primary);
+            margin: 0 5px;
+        }
+
+        .transfer-time {
+            font-size: 13px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .transfer-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d4edda; color: #155724; }
+        .status-in-progress { background: #cce5ff; color: #004085; }
+        .status-completed { background: #d1ecf1; color: #0c5460; }
+
+        .track-btn {
+            margin-top: 15px;
+            padding: 12px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--gray);
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-car"></i> Transfer Marrakech</h1>
+        <p>Espace Client - Suivez vos transferts</p>
+    </div>
+
+    <div class="container">
+        <div class="search-card">
+            <div class="search-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            
+            <div class="search-title">Rechercher un transfert</div>
+            <div class="search-subtitle">Entrez votre numéro de téléphone pour voir vos transferts</div>
+            
+            <form id="searchForm">
+                <div class="form-group">
+                    <label class="form-label">Numéro de téléphone</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-phone input-icon"></i>
+                        <input type="tel" class="form-control" id="phoneInput" placeholder="ex: +212 6XX XXX XXX" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-search" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                    Rechercher
+                </button>
+            </form>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-title">
+                <i class="fas fa-list"></i>
+                Vos transferts
+            </div>
+            <div id="resultsList"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><a href="/login.html"><i class="fas fa-lock"></i> Espace administrateur</a></p>
+        <p style="margin-top: 10px;">© 2024 Transfer Marrakech</p>
+    </div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const phone = document.getElementById('phoneInput').value;
+            const btn = document.getElementById('searchBtn');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche...';
+            
+            try {
+                const res = await fetch(`/api/transfers/lookup?phone=${encodeURIComponent(phone)}`);
+                const data = await res.json();
+                
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsList = document.getElementById('resultsList');
+                
+                resultsSection.style.display = 'block';
+                
+                if (data.transfers && data.transfers.length > 0) {
+                    resultsList.innerHTML = data.transfers.map(t => {
+                        const date = new Date(t.pickup_time);
+                        const dateStr = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+                        const timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                        
+                        let statusClass = 'status-pending';
+                        let statusText = 'En attente';
+                        if (t.status === 'confirmed') {
+                            statusClass = 'status-confirmed';
+                            statusText = 'Confirmé';
+                        } else if (t.status === 'in_progress') {
+                            statusClass = 'status-in-progress';
+                            statusText = 'En cours';
+                        } else if (t.status === 'completed') {
+                            statusClass = 'status-completed';
+                            statusText = 'Terminé';
+                        }
+                        
+                        return `
+                            <div class="transfer-card">
+                                <div class="transfer-header">
+                                    <div class="transfer-route">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        ${t.pickup_location}
+                                        <i class="fas fa-arrow-right"></i>
+                                        ${t.destination}
+                                    </div>
+                                    <span class="transfer-status ${statusClass}">${statusText}</span>
+                                </div>
+                                <div class="transfer-time">
+                                    <i class="fas fa-calendar"></i>
+                                    ${dateStr} à ${timeStr}
+                                </div>
+                                ${t.tracking_token ? `
+                                <a href="/track.html?token=${t.tracking_token}" class="track-btn">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Suivre en temps réel
+                                </a>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    resultsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>Aucun transfert trouvé</p>
+                            <p style="font-size: 14px; margin-top: 10px;">Vérifiez votre numéro de téléphone</p>
+                        </div>
+                    `;
+                }
+                
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (err) {
+                alert('Erreur lors de la recherche. Veuillez réessayer.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search"></i> Rechercher';
+            }
+        });
+    </script>
+</body>
+</html>
