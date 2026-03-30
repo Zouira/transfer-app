@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi de votre Transfert - Transfer Alert System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d4edda; color: #155724; }
+        .status-confirmed_by_call { background: #d1ecf1; color: #0c5460; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        
+        .info-row {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            width: 120px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .timeline {
+            margin-top: 20px;
+        }
+        
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            position: relative;
+        }
+        
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 45px;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+        
+        .timeline-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .timeline-icon.completed {
+            background: #28a745;
+            color: white;
+        }
+        
+        .timeline-icon.pending {
+            background: #e0e0e0;
+            color: #999;
+        }
+        
+        .timeline-content h4 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .timeline-content p {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .error-state .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .error-state h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .error-state p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Transfer Alert System</h1>
+            <p>Suivi de votre transfert en temps réel</p>
+        </div>
+
+        <div id="content">
+            <div class="card loading">
+                <div class="spinner"></div>
+                <p>Chargement des informations...</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            Powered by Transfer Alert System - Marrakech
+        </div>
+    </div>
+
+    <script>
+        // Get token from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (!token) {
+            document.getElementById('content').innerHTML = `
+                <div class="card error-state">
+                    <div class="icon">❌</div>
+                    <h2>Lien invalide</h2>
+                    <p>Le lien de suivi est incorrect ou a expiré.<br>Veuillez contacter le service client.</p>
+                </div>
+            `;
+        } else {
+            loadTransfer();
+        }
+
+        async function loadTransfer() {
+            try {
+                const response = await fetch(`/api/track/${token}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    document.getElementById('content').innerHTML = `
+                        <div class="card error-state">
+                            <div class="icon">🔍</div>
+                            <h2>Transfert non trouvé</h2>
+                            <p>Ce transfert n'existe pas ou a été supprimé.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const t = data.transfer;
+                const statusLabels = {
+                    'pending': 'En attente de confirmation',
+                    'confirmed': '✅ Confirmé par le chauffeur',
+                    'confirmed_by_call': '✅ Confirmé par appel téléphonique',
+                    'cancelled': '❌ Annulé'
+                };
+
+                document.getElementById('content').innerHTML = `
+                    <div class="card">
+                        <div style="text-align: center;">
+                            <span class="status-badge status-${t.status}">
+                                ${statusLabels[t.status] || t.status}
+                            </span>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-label">👤 Client</div>
+                            <div class="info-value">${t.clientName}</div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-label">🕐 Date & Heure</div>
+                            <div class="info-value">${formatDate(t.pickupDateTime)}</div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-label">📍 Départ</div>
+                            <div class="info-value">${t.pickupLocation}</div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-label">🏁 Destination</div>
+                            <div class="info-value">${t.destination}</div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-label">🚗 Chauffeur</div>
+                            <div class="info-value">${t.driverName}</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px;">📋 Suivi du traitement</h3>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-icon completed">✓</div>
+                                <div class="timeline-content">
+                                    <h4>Transfert créé</h4>
+                                    <p>Votre réservation a été enregistrée</p>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item">
+                                <div class="timeline-icon ${t.status !== 'pending' ? 'completed' : 'pending'}">
+                                    ${t.status !== 'pending' ? '✓' : '○'}
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>Chauffeur assigné</h4>
+                                    <p>${t.driverName} est votre chauffeur</p>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item">
+                                <div class="timeline-icon ${t.status === 'confirmed' || t.status === 'confirmed_by_call' ? 'completed' : 'pending'}">
+                                    ${t.status === 'confirmed' || t.status === 'confirmed_by_call' ? '✓' : '○'}
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>Confirmation chauffeur</h4>
+                                    <p>${t.status === 'confirmed' || t.status === 'confirmed_by_call' 
+                                        ? 'Le chauffeur a confirmé le transfert' 
+                                        : 'En attente de confirmation'}</p>
+                                </div>
+                            </div>
+
+                            <div class="timeline-item">
+                                <div class="timeline-icon pending">○</div>
+                                <div class="timeline-content">
+                                    <h4>Transfert en cours</h4>
+                                    <p>Le chauffeur est en route</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${t.status === 'confirmed' || t.status === 'confirmed_by_call' ? `
+                    <div class="card" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border: none;">
+                        <div style="text-align: center; color: #155724;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
+                            <h3>Votre transfert est confirmé !</h3>
+                            <p style="margin-top: 10px;">Votre chauffeur sera là à l'heure convenue.</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+            } catch (error) {
+                document.getElementById('content').innerHTML = `
+                    <div class="card error-state">
+                        <div class="icon">⚠️</div>
+                        <h2>Erreur de chargement</h2>
+                        <p>Impossible de charger les informations. Veuillez réessayer.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('fr-FR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>
