@@ -542,7 +542,7 @@
             <div class="stat-label">Confirmés</div>
         </div>
         <div class="stat-card warning">
-            <div class="stat-icon">>i class="fas fa-clock"></i></div>
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
             <div class="stat-value" id="statPending">0</div>
             <div class="stat-label">En attente</div>
         </div>
@@ -608,9 +608,14 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button class="fab" onclick="openModal()">
+    <a href="/index.html" class="fab" style="display: flex; align-items: center; justify-content: center; text-decoration: none;">
         <i class="fas fa-plus"></i>
-    </button>
+    </a>
+
+    <!-- Bouton Tracking Client -->
+    <a href="/track.html" class="btn-tracking" style="position: fixed; bottom: 100px; left: 20px; width: 60px; height: 60px; border-radius: 50%; background: #27ae60; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; text-decoration: none; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4); z-index: 99;">
+        <i class="fas fa-map-marker-alt"></i>
+    </a>
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
@@ -618,74 +623,19 @@
             <i class="fas fa-home"></i>
             <span>Accueil</span>
         </a>
-        <a href="/transfers.html" class="nav-item">
-            <i class="fas fa-calendar"></i>
-            <span>Planning</span>
+        <a href="/index.html" class="nav-item">
+            <i class="fas fa-plus-circle"></i>
+            <span>Nouveau</span>
         </a>
-        <a href="/drivers.html" class="nav-item">
-            <i class="fas fa-users"></i>
-            <span>Chauffeurs</span>
+        <a href="/track.html" class="nav-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Suivi</span>
         </a>
-        <a href="/stats.html" class="nav-item">
-            <i class="fas fa-chart-bar"></i>
-            <span>Stats</span>
+        <a href="#" class="nav-item" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Déconnexion</span>
         </a>
     </nav>
-
-    <!-- Modal Nouveau Transfert -->
-    <div class="modal" id="newTransferModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="section-title">
-                    <i class="fas fa-plus-circle"></i>
-                    Nouveau transfert
-                </div>
-                <button class="btn-icon" onclick="closeModal()" style="color: var(--gray);">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="newTransferForm">
-                    <div class="form-group">
-                        <label>Nom du client</label>
-                        <input type="text" class="form-control" id="clientName" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Téléphone client</label>
-                        <input type="tel" class="form-control" id="clientPhone" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Date & Heure</label>
-                        <input type="datetime-local" class="form-control" id="pickupTime" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Lieu de départ</label>
-                        <input type="text" class="form-control" id="pickupLocation" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Destination</label>
-                        <input type="text" class="form-control" id="destination" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Chauffeur</label>
-                        <select class="form-control" id="driverId" required>
-                            <option value="">Sélectionner un chauffeur</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i> Créer le transfert
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -704,7 +654,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             loadDashboardData();
-            loadDrivers();
             setInterval(loadDashboardData, 30000); // Refresh every 30s
         });
 
@@ -846,70 +795,6 @@
             renderTransfers();
         }
 
-        async function loadDrivers() {
-            try {
-                const res = await fetch('/api/drivers', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const drivers = await res.json();
-                
-                const select = document.getElementById('driverId');
-                select.innerHTML = '<option value="">Sélectionner un chauffeur</option>' +
-                    drivers.map(d => `<option value="${d.id}">${d.name} (${d.phone})</option>
-                    `).join('');
-            } catch (err) {
-                console.error('Error loading drivers:', err);
-            }
-        }
-
-        function openModal() {
-            document.getElementById('newTransferModal').classList.add('show');
-            // Set default datetime to now + 2 hours
-            const now = new Date();
-            now.setHours(now.getHours() + 2);
-            document.getElementById('pickupTime').value = now.toISOString().slice(0, 16);
-        }
-
-        function closeModal() {
-            document.getElementById('newTransferModal').classList.remove('show');
-        }
-
-        document.getElementById('newTransferForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const data = {
-                client_name: document.getElementById('clientName').value,
-                client_phone: document.getElementById('clientPhone').value,
-                pickup_time: document.getElementById('pickupTime').value,
-                pickup_location: document.getElementById('pickupLocation').value,
-                destination: document.getElementById('destination').value,
-                driver_id: document.getElementById('driverId').value,
-                language: 'fr'
-            };
-            
-            try {
-                const res = await fetch('/api/transfers', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (res.ok) {
-                    closeModal();
-                    loadDashboardData();
-                    document.getElementById('newTransferForm').reset();
-                    alert('Transfert créé avec succès !');
-                } else {
-                    alert('Erreur lors de la création');
-                }
-            } catch (err) {
-                alert('Erreur réseau');
-            }
-        });
-
         function viewTransfer(id) {
             window.location.href = `/transfer-detail.html?id=${id}`;
         }
@@ -923,11 +808,6 @@
             localStorage.removeItem('user');
             window.location.href = '/login.html';
         }
-
-        // Close modal on outside click
-        document.getElementById('newTransferModal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeModal();
-        });
     </script>
 </body>
 </html>
