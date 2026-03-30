@@ -2,450 +2,721 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transfer Alert System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nouveau Transfert - Transfer Marrakech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #d35400;
+            --primary-light: #e67e22;
+            --primary-dark: #a04000;
+            --secondary: #27ae60;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --light: #f5f7fa;
+            --white: #ffffff;
+            --gradient: linear-gradient(135deg, #d35400 0%, #e67e22 100%);
+            --shadow: 0 10px 40px rgba(211, 84, 0, 0.2);
+            --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            background: var(--light);
             min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2rem;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .card h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 14px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            width: 100%;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .transfers-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .transfer-item {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .transfer-item.pending { border-left-color: #ffc107; }
-        .transfer-item.confirmed { border-left-color: #28a745; }
-        .transfer-item.alert { border-left-color: #dc3545; }
-        
-        .transfer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .transfer-client {
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .transfer-status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-confirmed { background: #d4edda; color: #155724; }
-        .status-alert { background: #f8d7da; color: #721c24; }
-        
-        .transfer-details {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        
-        .transfer-details strong {
-            color: #333;
-        }
-        
-        .empty-state {
-            text-align: center;
-            color: #999;
-            padding: 40px;
-        }
-        
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: none;
-        }
-        
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            display: block;
-        }
-        
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            display: block;
-        }
-        
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #2196F3;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 0 8px 8px 0;
-        }
-        
-        .info-box h3 {
-            color: #1976D2;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .info-box p {
-            color: #555;
-            font-size: 13px;
-            line-height: 1.5;
+            padding-bottom: 20px;
         }
 
-        .workflow {
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-            padding: 15px;
-            background: #f0f4ff;
-            border-radius: 8px;
-        }
-
-        .workflow-step {
+        /* Header */
+        .header {
+            background: var(--gradient);
+            color: white;
+            padding: 30px 20px;
             text-align: center;
-            flex: 1;
             position: relative;
         }
 
-        .workflow-step:not(:last-child)::after {
-            content: '→';
+        .header::after {
+            content: '';
             position: absolute;
-            right: -10px;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: var(--light);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: #667eea;
-            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .workflow-step .icon {
+        .header h1 {
             font-size: 24px;
-            margin-bottom: 5px;
+            font-weight: 600;
         }
 
-        .workflow-step .label {
-            font-size: 12px;
-            color: #666;
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+            margin-top: 5px;
         }
 
-        @media (max-width: 600px) {
-            .workflow {
-                flex-direction: column;
-            }
-            .workflow-step:not(:last-child)::after {
-                content: '↓';
-                right: 50%;
-                top: 100%;
-                transform: translateX(50%);
-            }
+        /* Form Container */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 30px 25px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 16px 16px 50px;
+            border: 2px solid #e8e8e8;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(211, 84, 0, 0.1);
+        }
+
+        textarea.form-control {
+            padding-left: 16px;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        select.form-control {
+            padding-left: 16px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23d35400' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 20px;
+        }
+
+        /* Quick Select Buttons */
+        .quick-select {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            padding: 10px 16px;
+            border: 2px solid #e8e8e8;
+            border-radius: 25px;
+            background: white;
+            color: var(--gray);
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-btn:hover, .quick-btn.active {
+            border-color: var(--primary);
+            background: rgba(211, 84, 0, 0.05);
+            color: var(--primary);
+        }
+
+        /* Driver Card Selection */
+        .driver-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .driver-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 2px solid #e8e8e8;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .driver-option:hover {
+            border-color: var(--primary-light);
+        }
+
+        .driver-option.selected {
+            border-color: var(--primary);
+            background: rgba(211, 84, 0, 0.05);
+        }
+
+        .driver-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .driver-info {
+            flex: 1;
+        }
+
+        .driver-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 3px;
+        }
+
+        .driver-phone {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .driver-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--secondary);
+        }
+
+        .driver-status.busy {
+            background: var(--danger);
+        }
+
+        /* Language Toggle */
+        .lang-toggle {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: 12px;
+            padding: 4px;
+            margin-top: 10px;
+        }
+
+        .lang-option {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .lang-option.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Submit Button */
+        .submit-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e8e8e8;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(211, 84, 0, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(211, 84, 0, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 48px;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .success-text {
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: var(--light);
+            color: var(--dark);
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e0e0e0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: var(--gray);
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚗 Transfer Alert System</h1>
-        
-        <div class="card">
-            <h2>⚡ Workflow Automatique</h2>
-            <div class="workflow">
-                <div class="workflow-step">
-                    <div class="icon">📋</div>
-                    <div class="label">Assignation</div>
-                </div>
-                <div class="workflow-step">
-                    <div class="icon">📞</div>
-                    <div class="label">Appel T-2h</div>
-                </div>
-                <div class="workflow-step">
-                    <div class="icon">💬</div>
-                    <div class="label">Rappel T-1h</div>
-                </div>
-                <div class="workflow-step">
-                    <div class="icon">🚨</div>
-                    <div class="label">Alerte T-30min</div>
-                </div>
-            </div>
-            <div class="info-box">
-                <h3>ℹ️ Comment ça marche</h3>
-                <p>1. Vous créez un transfert en assignant un chauffeur<br>
-                2. Le chauffeur reçoit un WhatsApp immédiat<br>
-                3. 2h avant : appel vocal automatique<br>
-                4. 1h avant : relance WhatsApp si pas de réponse<br>
-                5. 30min avant : alerte aux responsables si silence</p>
-            </div>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Création du transfert...</div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
         </div>
+        <div class="success-title">Transfert créé !</div>
+        <div class="success-text">
+            Le chauffeur sera notifié par WhatsApp.<br>
+            Vous pouvez suivre le transfert en temps réel.
+        </div>
+        <a href="/dashboard.html" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au dashboard
+        </a>
+    </div>
 
-        <div class="card">
-            <h2>📝 Nouveau Transfert</h2>
-            <div id="message" class="message"></div>
-            <form id="transferForm">
-                <div class="form-group">
-                    <label for="clientName">👤 Nom du Client</label>
-                    <input type="text" id="clientName" required placeholder="Mme Dupont">
-                </div>
-                
-                <div class="form-group">
-                    <label for="pickupDateTime">🕐 Date & Heure de prise en charge</label>
-                    <input type="datetime-local" id="pickupDateTime" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="pickupLocation">📍 Lieu de départ</label>
-                    <input type="text" id="pickupLocation" required placeholder="Aéroport CDG Terminal 2">
-                </div>
-                
-                <div class="form-group">
-                    <label for="destination">🏁 Destination</label>
-                    <input type="text" id="destination" required placeholder="Hôtel Paris Centre">
-                </div>
-                
-                <div class="form-group">
-                    <label for="driverName">🚗 Nom du Chauffeur</label>
-                    <input type="text" id="driverName" required placeholder="Ahmed">
-                </div>
-                
-                <div class="form-group">
-                    <label for="driverPhone">📱 Téléphone du Chauffeur (avec +212)</label>
-                    <input type="tel" id="driverPhone" required placeholder="+212 6XX XXX XXX" pattern="\+212[0-9]{9}">
+    <!-- Form -->
+    <div id="formSection">
+        <header class="header">
+            <a href="/dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1>Nouveau Transfert</h1>
+            <p>Créer un transfert pour votre client</p>
+        </header>
+
+        <div class="form-container">
+            <form class="form-card" id="transferForm">
+                <!-- Client Info -->
+                <div class="section-title">
+                    <i class="fas fa-user"></i>
+                    Informations client
                 </div>
 
                 <div class="form-group">
-                    <label for="language">🌐 Langue du Chauffeur</label>
-                    <select id="language" required>
-                        <option value="fr">🇫🇷 Français</option>
-                        <option value="ar">🇸🇦 Arabe</option>
-                    </select>
+                    <label class="form-label">Nom du client *</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" class="form-control" id="clientName" placeholder="ex: Mme Dupont" required>
+                    </div>
                 </div>
-                
-                <button type="submit" class="btn" id="submitBtn">✅ Créer le Transfert</button>
+
+                <div class="form-group">
+                    <label class="form-label">Téléphone client *</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-phone input-icon"></i>
+                        <input type="tel" class="form-control" id="clientPhone" placeholder="ex: +212 6XX XXX XXX" required>
+                    </div>
+                </div>
+
+                <!-- Trip Details -->
+                <div class="section-title" style="margin-top: 30px;">
+                    <i class="fas fa-route"></i>
+                    Détails du trajet
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Date et heure de prise en charge *</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-calendar-alt input-icon"></i>
+                        <input type="datetime-local" class="form-control" id="pickupTime" required>
+                    </div>
+                    <div class="quick-select">
+                        <button type="button" class="quick-btn" onclick="setTime('+2h')">Dans 2h</button>
+                        <button type="button" class="quick-btn" onclick="setTime('+4h')">Dans 4h</button>
+                        <button type="button" class="quick-btn" onclick="setTime('tomorrow')">Demain</button>
+                        <button type="button" class="quick-btn" onclick="setTime('tonight')">Ce soir 23h</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Lieu de départ *</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-map-marker-alt input-icon"></i>
+                        <input type="text" class="form-control" id="pickupLocation" placeholder="ex: Aéroport Marrakech" required>
+                    </div>
+                    <div class="quick-select">
+                        <button type="button" class="quick-btn" onclick="setLocation('pickup', 'Aéroport Marrakech Menara')">Aéroport</button>
+                        <button type="button" class="quick-btn" onclick="setLocation('pickup', 'Gare Marrakech')">Gare</button>
+                        <button type="button" class="quick-btn" onclick="setLocation('pickup', 'Médina Marrakech')">Médina</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Destination *</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-flag-checkered input-icon"></i>
+                        <input type="text" class="form-control" id="destination" placeholder="ex: Hôtel La Mamounia" required>
+                    </div>
+                    <div class="quick-select">
+                        <button type="button" class="quick-btn" onclick="setLocation('dest', 'Hôtel La Mamounia')">La Mamounia</button>
+                        <button type="button" class="quick-btn" onclick="setLocation('dest', 'Médina Marrakech')">Médina</button>
+                        <button type="button" class="quick-btn" onclick="setLocation('dest', 'Palmeraie')">Palmeraie</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notes (optionnel)</label>
+                    <textarea class="form-control" id="notes" placeholder="Informations complémentaires..."></textarea>
+                </div>
+
+                <!-- Driver Selection -->
+                <div class="section-title" style="margin-top: 30px;">
+                    <i class="fas fa-id-card"></i>
+                    Chauffeur assigné
+                </div>
+
+                <div class="form-group">
+                    <div class="driver-list" id="driverList">
+                        <!-- Drivers loaded dynamically -->
+                        <div style="text-align: center; padding: 20px; color: #7f8c8d;">
+                            <i class="fas fa-spinner fa-spin"></i> Chargement...
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedDriver" required>
+                </div>
+
+                <!-- Language -->
+                <div class="section-title" style="margin-top: 30px;">
+                    <i class="fas fa-language"></i>
+                    Langue des notifications
+                </div>
+
+                <div class="form-group">
+                    <div class="lang-toggle">
+                        <div class="lang-option active" onclick="setLanguage('fr')">
+                            <i class="fas fa-flag"></i> Français
+                        </div>
+                        <div class="lang-option" onclick="setLanguage('ar')">
+                            <i class="fas fa-flag"></i> العربية
+                        </div>
+                    </div>
+                    <input type="hidden" id="language" value="fr">
+                </div>
+
+                <div class="submit-section">
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Créer le transfert
+                    </button>
+                </div>
             </form>
-        </div>
-
-        <div class="card">
-            <h2>📋 Transferts en cours</h2>
-            <div id="transfersList" class="transfers-list">
-                <div class="empty-state">Chargement...</div>
-            </div>
         </div>
     </div>
 
     <script>
-        // Afficher un message
-        function showMessage(text, type) {
-            const msgEl = document.getElementById('message');
-            msgEl.textContent = text;
-            msgEl.className = `message ${type}`;
-            setTimeout(() => {
-                msgEl.className = 'message';
-            }, 5000);
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
         }
 
-        // Formater la date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleString('fr-FR', {
-                weekday: 'short',
-                day: 'numeric',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
+        let drivers = [];
+        let selectedDriverId = null;
 
-        // Charger les transferts
-        async function loadTransfers() {
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDrivers();
+            
+            // Set default datetime to now + 2 hours
+            const now = new Date();
+            now.setHours(now.getHours() + 2);
+            document.getElementById('pickupTime').value = now.toISOString().slice(0, 16);
+        });
+
+        async function loadDrivers() {
             try {
-                const response = await fetch('/api/transfers');
-                const data = await response.json();
+                const res = await fetch('/api/drivers', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 
-                const listEl = document.getElementById('transfersList');
-                
-                if (!data.transfers || data.transfers.length === 0) {
-                    listEl.innerHTML = '<div class="empty-state">Aucun transfert pour le moment</div>';
-                    return;
-                }
-                
-                listEl.innerHTML = data.transfers.map(t => {
-                    let statusClass = 'status-pending';
-                    let itemClass = 'pending';
-                    let statusText = 'En attente';
-                    
-                    if (t.status === 'confirmed' || t.status === 'confirmed_by_call') {
-                        statusClass = 'status-confirmed';
-                        itemClass = 'confirmed';
-                        statusText = 'Confirmé';
-                    } else if (t.alertSent === 1) {
-                        statusClass = 'status-alert';
-                        itemClass = 'alert';
-                        statusText = 'ALERTE';
-                    }
-                    
-                    const langFlag = t.language === 'ar' ? '🇸🇦' : '🇫🇷';
-                    
-                    return `
-                        <div class="transfer-item ${itemClass}">
-                            <div class="transfer-header">
-                                <span class="transfer-client">${t.clientName}</span>
-                                <span class="transfer-status ${statusClass}">${statusText}</span>
-                            </div>
-                            <div class="transfer-details">
-                                <strong>🕐</strong> ${formatDate(t.pickupDateTime)}<br>
-                                <strong>📍</strong> ${t.pickupLocation} → ${t.destination}<br>
-                                <strong>🚗</strong> ${t.driverName} (${t.driverPhone}) ${langFlag}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-            } catch (error) {
-                console.error('Erreur:', error);
+                drivers = await res.json();
+                renderDrivers();
+            } catch (err) {
+                document.getElementById('driverList').innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #e74c3c;">
+                        <i class="fas fa-exclamation-circle"></i> Erreur de chargement
+                    </div>
+                `;
             }
         }
 
-        // Soumettre le formulaire
+        function renderDrivers() {
+            const container = document.getElementById('driverList');
+            
+            container.innerHTML = drivers.map(driver => `
+                <div class="driver-option" onclick="selectDriver(${driver.id})" data-driver="${driver.id}">
+                    <div class="driver-avatar">${driver.name.charAt(0)}</div>
+                    <div class="driver-info">
+                        <div class="driver-name">${driver.name}</div>
+                        <div class="driver-phone">${driver.phone}</div>
+                    </div>
+                    <div class="driver-status ${driver.is_busy ? 'busy' : ''}"></div>
+                </div>
+            `).join('');
+        }
+
+        function selectDriver(id) {
+            selectedDriverId = id;
+            document.getElementById('selectedDriver').value = id;
+            
+            document.querySelectorAll('.driver-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector(`[data-driver="${id}"]`).classList.add('selected');
+        }
+
+        function setTime(offset) {
+            const now = new Date();
+            
+            if (offset === '+2h') {
+                now.setHours(now.getHours() + 2);
+            } else if (offset === '+4h') {
+                now.setHours(now.getHours() + 4);
+            } else if (offset === 'tomorrow') {
+                now.setDate(now.getDate() + 1);
+                now.setHours(10, 0, 0, 0);
+            } else if (offset === 'tonight') {
+                now.setHours(23, 0, 0, 0);
+            }
+            
+            document.getElementById('pickupTime').value = now.toISOString().slice(0, 16);
+            
+            // Update active state
+            document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function setLocation(type, value) {
+            if (type === 'pickup') {
+                document.getElementById('pickupLocation').value = value;
+            } else {
+                document.getElementById('destination').value = value;
+            }
+        }
+
+        function setLanguage(lang) {
+            document.getElementById('language').value = lang;
+            
+            document.querySelectorAll('.lang-option').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
         document.getElementById('transferForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Création en cours...';
+            if (!selectedDriverId) {
+                alert('Veuillez sélectionner un chauffeur');
+                return;
+            }
             
-            const transfer = {
-                clientName: document.getElementById('clientName').value,
-                pickupDateTime: document.getElementById('pickupDateTime').value,
-                pickupLocation: document.getElementById('pickupLocation').value,
+            const data = {
+                client_name: document.getElementById('clientName').value,
+                client_phone: document.getElementById('clientPhone').value,
+                pickup_time: document.getElementById('pickupTime').value,
+                pickup_location: document.getElementById('pickupLocation').value,
                 destination: document.getElementById('destination').value,
-                driverName: document.getElementById('driverName').value,
-                driverPhone: document.getElementById('driverPhone').value.replace(/\s/g, ''),
+                notes: document.getElementById('notes').value,
+                driver_id: selectedDriverId,
                 language: document.getElementById('language').value
             };
             
+            document.getElementById('loadingOverlay').classList.add('show');
+            document.getElementById('submitBtn').disabled = true;
+            
             try {
-                const response = await fetch('/api/transfers', {
+                const res = await fetch('/api/transfers', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(transfer)
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
                 });
                 
-                const data = await response.json();
-                
-                if (data.success) {
-                    showMessage('✅ Transfert créé ! WhatsApp envoyé au chauffeur.', 'success');
-                    document.getElementById('transferForm').reset();
-                    loadTransfers();
+                if (res.ok) {
+                    document.getElementById('loadingOverlay').classList.remove('show');
+                    document.getElementById('formSection').style.display = 'none';
+                    document.getElementById('successMessage').classList.add('show');
                 } else {
-                    showMessage('❌ Erreur: ' + data.error, 'error');
+                    const err = await res.json();
+                    throw new Error(err.error || 'Erreur lors de la création');
                 }
-            } catch (error) {
-                showMessage('❌ Erreur réseau: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '✅ Créer le Transfert';
+            } catch (err) {
+                document.getElementById('loadingOverlay').classList.remove('show');
+                document.getElementById('submitBtn').disabled = false;
+                alert('Erreur: ' + err.message);
             }
         });
-
-        // Charger les transferts au démarrage
-        loadTransfers();
-        // Rafraîchir toutes les 30 secondes
-        setInterval(loadTransfers, 30000);
     </script>
 </body>
 </html>

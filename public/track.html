@@ -2,355 +2,605 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suivi de votre Transfert - Transfer Alert System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Suivi de votre transfert - Marrakech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        :root {
+            --primary: #d35400;
+            --primary-light: #e67e22;
+            --secondary: #27ae60;
+            --info: #3498db;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --light: #f5f7fa;
+            --white: #ffffff;
+            --gradient: linear-gradient(135deg, #d35400 0%, #e67e22 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            background: var(--light);
             min-height: 100vh;
-            padding: 20px;
         }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
+
+        /* Header */
         .header {
-            text-align: center;
+            background: var(--gradient);
             color: white;
-            margin-bottom: 30px;
-            padding: 20px 0;
+            padding: 20px;
+            text-align: center;
+            position: relative;
         }
-        
+
         .header h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
         }
-        
+
         .header p {
             opacity: 0.9;
             font-size: 14px;
         }
-        
-        .card {
+
+        /* Status Card */
+        .status-card {
             background: white;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-        
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-confirmed { background: #d4edda; color: #155724; }
-        .status-confirmed_by_call { background: #d1ecf1; color: #0c5460; }
-        .status-cancelled { background: #f8d7da; color: #721c24; }
-        
-        .info-row {
-            display: flex;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            width: 120px;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .info-value {
-            flex: 1;
-            color: #333;
-            font-weight: 500;
-        }
-        
-        .timeline {
-            margin-top: 20px;
-        }
-        
-        .timeline-item {
-            display: flex;
-            gap: 15px;
-            padding: 15px 0;
+            margin: -30px 20px 20px;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             position: relative;
+            z-index: 10;
         }
-        
-        .timeline-item:not(:last-child)::before {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 45px;
-            bottom: 0;
-            width: 2px;
-            background: #e0e0e0;
+
+        .status-header {
+            text-align: center;
+            margin-bottom: 25px;
         }
-        
-        .timeline-icon {
-            width: 32px;
-            height: 32px;
+
+        .status-icon {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 36px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-confirmed .status-icon {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--secondary);
+        }
+
+        .status-progress .status-icon {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--info);
+            animation: spin 2s linear infinite;
+        }
+
+        .status-arrived .status-icon {
+            background: rgba(211, 84, 0, 0.1);
+            color: var(--primary);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .status-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .status-subtitle {
+            color: var(--gray);
             font-size: 14px;
-            flex-shrink: 0;
         }
-        
-        .timeline-icon.completed {
-            background: #28a745;
-            color: white;
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
         }
-        
-        .timeline-icon.pending {
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
             background: #e0e0e0;
-            color: #999;
         }
-        
-        .timeline-content h4 {
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 25px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #e0e0e0;
+        }
+
+        .timeline-item.completed .timeline-dot {
+            background: var(--secondary);
+            box-shadow: 0 0 0 2px var(--secondary);
+        }
+
+        .timeline-item.active .timeline-dot {
+            background: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
             font-size: 14px;
-            color: #333;
-            margin-bottom: 4px;
         }
-        
-        .timeline-content p {
+
+        .timeline-time {
             font-size: 12px;
-            color: #999;
+            color: var(--gray);
         }
-        
-        .error-state {
-            text-align: center;
-            padding: 40px 20px;
+
+        /* Map */
+        .map-container {
+            height: 300px;
+            margin: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-        
-        .error-state .icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+
+        #map {
+            height: 100%;
+            width: 100%;
         }
-        
-        .error-state h2 {
-            color: #333;
-            margin-bottom: 10px;
+
+        /* Driver Card */
+        .driver-card {
+            background: white;
+            margin: 0 20px 20px;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        
-        .error-state p {
-            color: #666;
+
+        .driver-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .driver-info {
+            flex: 1;
+        }
+
+        .driver-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .driver-rating {
+            color: #f39c12;
             font-size: 14px;
         }
-        
-        .footer {
-            text-align: center;
-            color: rgba(255,255,255,0.7);
-            font-size: 12px;
-            margin-top: 20px;
+
+        .driver-phone {
+            margin-top: 10px;
         }
-        
+
+        .btn-call {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--secondary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Trip Info */
+        .trip-info {
+            background: white;
+            margin: 0 20px 20px;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .trip-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .trip-row:last-child {
+            border-bottom: none;
+        }
+
+        .trip-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .trip-value {
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        /* ETA Banner */
+        .eta-banner {
+            background: var(--gradient);
+            color: white;
+            margin: 0 20px 20px;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .eta-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .eta-time {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        /* Share Button */
+        .share-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(211, 84, 0, 0.4);
+        }
+
+        /* Loading */
         .loading {
-            text-align: center;
-            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--light);
         }
-        
+
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e0e0e0;
+            border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .loading-text {
+            margin-top: 20px;
+            color: var(--gray);
+        }
+
+        /* Not Found */
+        .not-found {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .not-found i {
+            font-size: 64px;
+            color: #e0e0e0;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🚗 Transfer Alert System</h1>
-            <p>Suivi de votre transfert en temps réel</p>
-        </div>
-
-        <div id="content">
-            <div class="card loading">
-                <div class="spinner"></div>
-                <p>Chargement des informations...</p>
-            </div>
-        </div>
-
-        <div class="footer">
-            Powered by Transfer Alert System - Marrakech
+    <div id="app">
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <div class="loading-text">Chargement de votre transfert...</div>
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Get token from URL
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
+        let map;
+        let driverMarker;
+        let refreshInterval;
 
         if (!token) {
-            document.getElementById('content').innerHTML = `
-                <div class="card error-state">
-                    <div class="icon">❌</div>
+            document.getElementById('app').innerHTML = `
+                <div class="not-found">
+                    <i class="fas fa-link-slash"></i>
                     <h2>Lien invalide</h2>
-                    <p>Le lien de suivi est incorrect ou a expiré.<br>Veuillez contacter le service client.</p>
+                    <p>Ce lien de suivi n'est pas valide ou a expiré.</p>
                 </div>
             `;
         } else {
-            loadTransfer();
+            loadTrackingData();
+            refreshInterval = setInterval(loadTrackingData, 30000); // Refresh every 30s
         }
 
-        async function loadTransfer() {
+        async function loadTrackingData() {
             try {
-                const response = await fetch(`/api/track/${token}`);
-                const data = await response.json();
-
-                if (!data.success) {
-                    document.getElementById('content').innerHTML = `
-                        <div class="card error-state">
-                            <div class="icon">🔍</div>
-                            <h2>Transfert non trouvé</h2>
-                            <p>Ce transfert n'existe pas ou a été supprimé.</p>
-                        </div>
-                    `;
-                    return;
+                const res = await fetch(`/api/transfers/track/${token}`);
+                
+                if (!res.ok) {
+                    throw new Error('Transfer not found');
                 }
-
-                const t = data.transfer;
-                const statusLabels = {
-                    'pending': 'En attente de confirmation',
-                    'confirmed': '✅ Confirmé par le chauffeur',
-                    'confirmed_by_call': '✅ Confirmé par appel téléphonique',
-                    'cancelled': '❌ Annulé'
-                };
-
-                document.getElementById('content').innerHTML = `
-                    <div class="card">
-                        <div style="text-align: center;">
-                            <span class="status-badge status-${t.status}">
-                                ${statusLabels[t.status] || t.status}
-                            </span>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">👤 Client</div>
-                            <div class="info-value">${t.clientName}</div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">🕐 Date & Heure</div>
-                            <div class="info-value">${formatDate(t.pickupDateTime)}</div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">📍 Départ</div>
-                            <div class="info-value">${t.pickupLocation}</div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">🏁 Destination</div>
-                            <div class="info-value">${t.destination}</div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">🚗 Chauffeur</div>
-                            <div class="info-value">${t.driverName}</div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3 style="margin-bottom: 15px;">📋 Suivi du traitement</h3>
-                        
-                        <div class="timeline">
-                            <div class="timeline-item">
-                                <div class="timeline-icon completed">✓</div>
-                                <div class="timeline-content">
-                                    <h4>Transfert créé</h4>
-                                    <p>Votre réservation a été enregistrée</p>
-                                </div>
-                            </div>
-
-                            <div class="timeline-item">
-                                <div class="timeline-icon ${t.status !== 'pending' ? 'completed' : 'pending'}">
-                                    ${t.status !== 'pending' ? '✓' : '○'}
-                                </div>
-                                <div class="timeline-content">
-                                    <h4>Chauffeur assigné</h4>
-                                    <p>${t.driverName} est votre chauffeur</p>
-                                </div>
-                            </div>
-
-                            <div class="timeline-item">
-                                <div class="timeline-icon ${t.status === 'confirmed' || t.status === 'confirmed_by_call' ? 'completed' : 'pending'}">
-                                    ${t.status === 'confirmed' || t.status === 'confirmed_by_call' ? '✓' : '○'}
-                                </div>
-                                <div class="timeline-content">
-                                    <h4>Confirmation chauffeur</h4>
-                                    <p>${t.status === 'confirmed' || t.status === 'confirmed_by_call' 
-                                        ? 'Le chauffeur a confirmé le transfert' 
-                                        : 'En attente de confirmation'}</p>
-                                </div>
-                            </div>
-
-                            <div class="timeline-item">
-                                <div class="timeline-icon pending">○</div>
-                                <div class="timeline-content">
-                                    <h4>Transfert en cours</h4>
-                                    <p>Le chauffeur est en route</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    ${t.status === 'confirmed' || t.status === 'confirmed_by_call' ? `
-                    <div class="card" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border: none;">
-                        <div style="text-align: center; color: #155724;">
-                            <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
-                            <h3>Votre transfert est confirmé !</h3>
-                            <p style="margin-top: 10px;">Votre chauffeur sera là à l'heure convenue.</p>
-                        </div>
-                    </div>
-                    ` : ''}
-                `;
-            } catch (error) {
-                document.getElementById('content').innerHTML = `
-                    <div class="card error-state">
-                        <div class="icon">⚠️</div>
-                        <h2>Erreur de chargement</h2>
-                        <p>Impossible de charger les informations. Veuillez réessayer.</p>
+                
+                const data = await res.json();
+                renderTrackingPage(data);
+            } catch (err) {
+                document.getElementById('app').innerHTML = `
+                    <div class="not-found">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h2>Transfert non trouvé</h2>
+                        <p>Ce transfert n'existe pas ou a été supprimé.</p>
                     </div>
                 `;
             }
         }
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleString('fr-FR', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+        function renderTrackingPage(data) {
+            const transfer = data.transfer;
+            const driver = data.driver;
+            
+            let statusClass = 'status-confirmed';
+            let statusIcon = 'fa-check-circle';
+            let statusTitle = 'Transfert confirmé';
+            let statusSubtitle = 'Votre chauffeur a confirmé le rendez-vous';
+            
+            if (transfer.status === 'in_progress') {
+                statusClass = 'status-progress';
+                statusIcon = 'fa-car';
+                statusTitle = 'Chauffeur en route';
+                statusSubtitle = 'Votre chauffeur arrive';
+            } else if (transfer.status === 'completed') {
+                statusClass = 'status-arrived';
+                statusIcon = 'fa-flag-checkered';
+                statusTitle = 'Transfert terminé';
+                statusSubtitle = 'Merci d\'avoir voyagé avec nous';
+            }
+            
+            const pickupDate = new Date(transfer.pickup_time);
+            const now = new Date();
+            const diffMinutes = Math.floor((pickupDate - now) / 60000);
+            
+            let etaText = 'À l\'heure';
+            if (diffMinutes > 0) {
+                const hours = Math.floor(diffMinutes / 60);
+                const mins = diffMinutes % 60;
+                etaText = hours > 0 ? `${hours}h ${mins}min` : `${mins}min`;
+            }
+            
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <h1><i class="fas fa-car"></i> Transfer Marrakech</h1>
+                    <p>Suivi en temps réel de votre transfert</p>
+                </div>
+                
+                <div class="status-card ${statusClass}">
+                    <div class="status-header">
+                        <div class="status-icon">
+                            <i class="fas ${statusIcon}"></i>
+                        </div>
+                        <div class="status-title">${statusTitle}</div>
+                        <div class="status-subtitle">${statusSubtitle}</div>
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item ${transfer.status !== 'pending' ? 'completed' : 'active'}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Réservation confirmée</div>
+                                <div class="timeline-time">${new Date(transfer.created_at).toLocaleString('fr-FR')}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item ${transfer.status === 'in_progress' || transfer.status === 'completed' ? 'completed' : transfer.status === 'confirmed' ? 'active' : ''}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Chauffeur assigné</div>
+                                <div class="timeline-time">${driver ? driver.name : 'En attente'}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item ${transfer.status === 'in_progress' ? 'active' : transfer.status === 'completed' ? 'completed' : ''}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">En route vers vous</div>
+                                <div class="timeline-time">${transfer.status === 'in_progress' ? 'Actuellement' : 'Prochainement'}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item ${transfer.status === 'completed' ? 'completed' : ''}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Arrivée à destination</div>
+                                <div class="timeline-time">${transfer.status === 'completed' ? 'Terminé' : 'À venir'}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                ${transfer.status === 'in_progress' ? `
+                <div class="eta-banner">
+                    <div class="eta-label">Arrivée estimée dans</div>
+                    <div class="eta-time">${etaText}</div>
+                </div>
+                ` : ''}
+                
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+                
+                ${driver ? `
+                <div class="driver-card">
+                    <div class="driver-avatar">
+                        ${driver.name.charAt(0)}
+                    </div>
+                    <div class="driver-info">
+                        <div class="driver-name">${driver.name}</div>
+                        <div class="driver-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span style="color: #7f8c8d; margin-left: 5px;">(4.8)</span>
+                        </div>
+                        <div class="driver-phone">
+                            <a href="tel:${driver.phone}" class="btn-call">
+                                <i class="fas fa-phone"></i> Appeler le chauffeur
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="trip-info">
+                    <div class="trip-row">
+                        <span class="trip-label">Date & Heure</span>
+                        <span class="trip-value">${pickupDate.toLocaleString('fr-FR')}</span>
+                    </div>
+                    <div class="trip-row">
+                        <span class="trip-label">Départ</span>
+                        <span class="trip-value">${transfer.pickup_location}</span>
+                    </div>
+                    <div class="trip-row">
+                        <span class="trip-label">Destination</span>
+                        <span class="trip-value">${transfer.destination}</span>
+                    </div>
+                    <div class="trip-row">
+                        <span class="trip-label">Numéro de transfert</span>
+                        <span class="trip-value">#${transfer.id.toString().padStart(4, '0')}</span>
+                    </div>
+                </div>
+                
+                <button class="share-btn" onclick="shareTracking()">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            `;
+            
+            // Init map
+            initMap(transfer, driver);
         }
+
+        function initMap(transfer, driver) {
+            map = L.map('map').setView([31.6295, -7.9811], 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+            
+            // Add pickup location marker
+            L.marker([31.6068, -8.0383])
+                .addTo(map)
+                .bindPopup('Aéroport Marrakech')
+                .openPopup();
+            
+            // Add driver marker if location available
+            if (driver && driver.last_lat && driver.last_lng) {
+                const carIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background: #d35400; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"><i class="fas fa-car"></i></div>',
+                    iconSize: [40, 40]
+                });
+                
+                driverMarker = L.marker([driver.last_lat, driver.last_lng], { icon: carIcon })
+                    .addTo(map)
+                    .bindPopup('Votre chauffeur');
+            }
+        }
+
+        async function shareTracking() {
+            if (navigator.share) {
+                await navigator.share({
+                    title: 'Suivi de mon transfert - Marrakech',
+                    text: 'Suivez mon transfert en temps réel',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback - copy to clipboard
+                navigator.clipboard.writeText(window.location.href);
+                alert('Lien copié dans le presse-papiers !');
+            }
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) clearInterval(refreshInterval);
+        });
     </script>
 </body>
 </html>
